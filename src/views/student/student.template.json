@@ -1,0 +1,14 @@
+[
+  {
+    "label": "班级",
+    "value": "className"
+  },
+  {
+    "label": "姓名",
+    "value": "name"
+  },
+  {
+    "label": "性别",
+    "value": "gender"
+  }
+]

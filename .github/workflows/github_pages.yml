@@ -1,0 +1,33 @@
+name: GitHub Pages Deploy
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - name: Setup node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install and Build
+      run: |
+        npm install
+        npm run build
+    - name: Copy 404
+      run: |
+        cp dist/index.html dist/404.html
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_PAGES }}
+        BRANCH: deploy
+        FOLDER: dist

@@ -1,0 +1,26 @@
+[
+  {
+    "label": "学期",
+    "value": "term"
+  },
+  {
+    "label": "班级",
+    "value": "className"
+  },
+  {
+    "label": "姓名",
+    "value": "name"
+  },
+  {
+    "label": "学科",
+    "value": "kind"
+  },
+  {
+    "label": "测试名称",
+    "value": "testName"
+  },
+  {
+    "label": "成绩",
+    "value": "score"
+  }
+]
