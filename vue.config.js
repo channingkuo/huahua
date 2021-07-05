@@ -2,7 +2,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
 module.exports = {
-  publicPath: process.env.NODE_ENV !== 'production' ? '/' : '/vue-storyboard/',
+  publicPath: process.env.NODE_ENV !== 'production' ? '/' : '/huahua/',
   // publicPath: '../',
 
   productionSourceMap: process.env.NODE_ENV !== 'production',
@@ -10,7 +10,7 @@ module.exports = {
   chainWebpack: config => {
     config.plugin('html')
       .tap(args => {
-        args[0].title = 'Vue Storyboard'
+        args[0].title = '花花'
         return args
       })
 
