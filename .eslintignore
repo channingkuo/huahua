@@ -1,7 +1,0 @@
-dist/
-docs/
-node_modules
-*.log
-run
-logs/
-coverage/
