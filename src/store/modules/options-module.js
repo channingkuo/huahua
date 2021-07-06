@@ -36,6 +36,12 @@ const optionsModule = {
         title: '学生名单',
         icon: 'team',
         path: '/student'
+      },
+      {
+        key: '5',
+        title: '时钟',
+        icon: 'clock-circle',
+        path: '/clock'
       }
     ],
     termList: [

@@ -39,6 +39,12 @@ const routes = [
         name: 'Class',
         meta: { title: '班级列表' },
         component: () => import(/* webpackChunkName: "class" */ '../views/class/class.vue')
+      },
+      {
+        path: 'clock',
+        name: 'Clock',
+        meta: { title: '时钟' },
+        component: () => import(/* webpackChunkName: "clock" */ '../views/clock/clock.vue')
       }
     ]
   },
