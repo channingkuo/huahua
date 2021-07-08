@@ -14,7 +14,6 @@
             </a-select>
             <span class="search-field-control-header ml-5">班级：</span>
             <a-select v-model="className" style="width: 140px">
-              <a-select-option value="null"> 全部 </a-select-option>
               <template v-for="classItem in classList">
                 <a-select-option :key="classItem.cea_class_id" :value="classItem.cea_class_name">
                   {{ classItem.cea_class_name }}
@@ -196,6 +195,45 @@ export default {
       studentName: '',
 
       loading: false,
+      tmpColumns: [
+        {
+          title: '#',
+          dataIndex: 'index',
+          scopedSlots: { customRender: 'index' },
+          width: 60,
+          align: 'center',
+          fixed: 'left'
+        },
+        // {
+        //   title: '学期',
+        //   dataIndex: 'cea_term',
+        //   width: 100,
+        //   align: 'center',
+        //   fixed: 'left'
+        // },
+        // {
+        //   title: '班级',
+        //   dataIndex: 'cea_class_name',
+        //   width: 100,
+        //   align: 'center',
+        //   fixed: 'left'
+        // },
+        {
+          title: '姓名',
+          dataIndex: 'cea_student_name',
+          scopedSlots: { customRender: 'cea_student_name' },
+          width: 100,
+          align: 'center',
+          fixed: 'left'
+        },
+        {
+          title: '学科',
+          dataIndex: 'cea_kind',
+          width: 100,
+          align: 'center',
+          fixed: 'left'
+        }
+      ],
       columns: [
         {
           title: '#',
@@ -205,20 +243,20 @@ export default {
           align: 'center',
           fixed: 'left'
         },
-        {
-          title: '学期',
-          dataIndex: 'cea_term',
-          width: 100,
-          align: 'center',
-          fixed: 'left'
-        },
-        {
-          title: '班级',
-          dataIndex: 'cea_class_name',
-          width: 100,
-          align: 'center',
-          fixed: 'left'
-        },
+        // {
+        //   title: '学期',
+        //   dataIndex: 'cea_term',
+        //   width: 100,
+        //   align: 'center',
+        //   fixed: 'left'
+        // },
+        // {
+        //   title: '班级',
+        //   dataIndex: 'cea_class_name',
+        //   width: 100,
+        //   align: 'center',
+        //   fixed: 'left'
+        // },
         {
           title: '姓名',
           dataIndex: 'cea_student_name',
@@ -260,6 +298,7 @@ export default {
     md5,
     async loadList() {
       this.loading = true
+
       const payload = {
         term: this.term,
         className: this.className,
@@ -317,6 +356,7 @@ export default {
       }
     },
     async onSearch() {
+      this.columns = this.tmpColumns
       this.loading = true
       const payload = {
         term: this.term,
@@ -340,6 +380,25 @@ export default {
             const testName = testNameSplitList[j]
             score[testName] = scoreSplitList[j]
           }
+        }
+        const testNameSplitList = testNameSets.split(',')
+        testNameSplitList.sort((a, b) => {
+          const tmp1 = a.split('.')
+          const tmp2 = b.split('.')
+          if (parseInt(tmp1[0]) < parseInt(tmp2[0])) {
+            return -1
+          } else {
+            return 1
+          }
+        })
+        this.testNameList = testNameSplitList
+        for (let k = 0; k < testNameSplitList.length; k++) {
+          const item = testNameSplitList[k]
+          this.columns.push({
+            title: item,
+            dataIndex: item,
+            align: 'center'
+          })
         }
       }
     },

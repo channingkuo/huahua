@@ -19,23 +19,24 @@ const optionsModule = {
         icon: 'team',
         path: '/term/student'
       },
-      // {
-      //   key: '2',
-      //   title: '任课班级',
-      //   icon: 'bars',
-      //   path: '/teacher/class'
-      // },
       {
-        key: '3',
-        title: '班级列表',
-        icon: 'menu',
-        path: '/class'
-      },
-      {
-        key: '4',
-        title: '学生名单',
-        icon: 'team',
-        path: '/student'
+        key: '222',
+        title: '基础数据',
+        icon: 'bars',
+        children: [
+          {
+            key: '3',
+            title: '班级列表',
+            icon: 'menu',
+            path: '/class'
+          },
+          {
+            key: '4',
+            title: '学生名单',
+            icon: 'team',
+            path: '/student'
+          }
+        ]
       },
       {
         key: '5',

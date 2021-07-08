@@ -19,34 +19,66 @@
       </a-select>
     </div>
     <div id="overview" class="w-full h-96"></div>
-    <div class="w-full flex justify-start items-center">
-      <div class="w-1/2">
-        <div class="h-14 pb-2 flex justify-start items-center">
-          <span class="pl-2">考试内容：</span>
-          <a-select v-model="testName" style="width: 140px" @change="handleTestChange">
-            <template v-for="test in testNameList">
-              <a-select-option :key="test" :value="test">
-                {{ test }}
-              </a-select-option>
-            </template>
-          </a-select>
-        </div>
-        <div id="single-test" class="w-full h-96"></div>
-      </div>
-      <div class="w-1/2">
-        <div class="h-14 pb-2 flex justify-start items-center">
-          <span class="pl-2">学生：</span>
-          <a-select v-model="studentName" style="width: 140px" @change="handleStudentChange">
-            <template v-for="name in studentList">
-              <a-select-option :key="name" :value="name">
-                {{ name }}
-              </a-select-option>
-            </template>
-          </a-select>
-        </div>
-        <div id="single-student-test" class="w-full h-96"></div>
-      </div>
+
+    <div class="h-14 pb-2 flex justify-start items-center">
+      <span class="pl-2">学期：</span>
+      <a-select v-model="section2Term" style="width: 140px" @change="section2TermChange">
+        <template v-for="option in termOptions">
+          <a-select-option :value="option.value" :key="option.value">
+            {{ option.label }}
+          </a-select-option>
+        </template>
+      </a-select>
+      <span class="pl-2">班级：</span>
+      <a-select v-model="section2ClassName" style="width: 140px" @change="section2ClassChange">
+        <template v-for="classItem in section2ClassList">
+          <a-select-option :key="classItem.cea_class_id" :value="classItem.cea_class_name">
+            {{ classItem.cea_class_name }}
+          </a-select-option>
+        </template>
+      </a-select>
+      <span class="pl-2">考试内容：</span>
+      <a-select v-model="section2TestName" style="width: 140px" @change="section2TestChange">
+        <template v-for="test in section2TestNameList">
+          <a-select-option :key="test" :value="test">
+            {{ test }}
+          </a-select-option>
+        </template>
+      </a-select>
+      <a-tooltip placement="top" title="由高到低排序">
+        <a-icon class="size-change m-5" type="sort-ascending" @click="onSortTestScore" />
+      </a-tooltip>
     </div>
+    <div id="single-test" class="w-full h-96"></div>
+
+    <div class="h-14 pb-2 flex justify-start items-center">
+      <span class="pl-2">学期：</span>
+      <a-select v-model="section3Term" style="width: 140px" @change="section3TermChange">
+        <template v-for="option in termOptions">
+          <a-select-option :value="option.value" :key="option.value">
+            {{ option.label }}
+          </a-select-option>
+        </template>
+      </a-select>
+      <span class="pl-2">班级：</span>
+      <a-select v-model="section3ClassName" style="width: 140px" @change="section3ClassChange">
+        <template v-for="classItem in section3ClassList">
+          <a-select-option :key="classItem.cea_class_id" :value="classItem.cea_class_name">
+            {{ classItem.cea_class_name }}
+          </a-select-option>
+        </template>
+      </a-select>
+      <span class="pl-2">学生：</span>
+      <a-select v-model="studentName" style="width: 140px" @change="section3StudentChange">
+        <template v-for="name in studentList">
+          <a-select-option :key="name" :value="name">
+            {{ name }}
+          </a-select-option>
+        </template>
+      </a-select>
+    </div>
+    <div id="single-student-test" class="w-full h-96"></div>
+
     <div class="h-20"></div>
   </div>
 </template>
@@ -65,8 +97,16 @@ export default {
       term: '',
       className: '',
       classList: [],
-      testName: '',
-      testNameList: [],
+
+      section2Term: '',
+      section2ClassName: '',
+      section2ClassList: [],
+      section2TestName: '',
+      section2TestNameList: [],
+
+      section3Term: '',
+      section3ClassName: '',
+      section3ClassList: [],
       studentName: '',
       studentList: [],
 
@@ -80,6 +120,8 @@ export default {
     const year = date.getFullYear()
     const month = date.getMonth() + 1
     this.term = `${year}-${month < 9 ? '上' : '下'}半学期`
+    this.section2Term = `${year}-${month < 9 ? '上' : '下'}半学期`
+    this.section3Term = `${year}-${month < 9 ? '上' : '下'}半学期`
   },
   mounted() {
     this.$nextTick(async () => {
@@ -89,66 +131,26 @@ export default {
       this.overviewChart.showLoading({ text: '正在加载...' })
       this.singleTestChart.showLoading({ text: '正在加载...' })
       this.singleStudentTestChart.showLoading({ text: '正在加载...' })
-      await this.loadClassList()
-
-      const overviewData = await this.loadOverviewData()
-      this.setOverviewOption(overviewData)
-
-      const singleTestData = await this.loadSingleTestData()
-      this.setSingleTestOption(singleTestData)
-
-      const singleStudentTestData = await this.loadSingleStudentTestData()
-      this.setSingleStudentTestOption(singleStudentTestData)
-    })
-  },
-  methods: {
-    async loadClassList() {
-      const data = await getClassList(this.userInfo.ceaTeacherId, this.term)
-      this.classList = data
-      if (this.classList.length > 0) {
-        this.className = this.classList[0].cea_class_name
+      const classList = await this.loadClassList(this.term)
+      this.classList = classList
+      this.section2ClassList = classList
+      this.section3ClassList = classList
+      if (classList.length > 0) {
+        this.className = classList[0].cea_class_name
+        this.section2ClassName = classList[0].cea_class_name
+        this.section3ClassName = classList[0].cea_class_name
       } else {
         this.className = '该学期暂无班级'
+        this.section2ClassName = '该学期暂无班级'
+        this.section3ClassName = '该学期暂无班级'
       }
-    },
-    async handleTermChange() {
-      await this.loadClassList()
 
-      const overviewData = await this.loadOverviewData()
-      this.setOverviewOption(overviewData)
-    },
-    async handleClassChange() {
-      const overviewData = await this.loadOverviewData()
-      this.setOverviewOption(overviewData)
-    },
-    async loadOverviewData() {
-      const payload = { term: this.term, className: this.className, kind: '数学' }
-      return await overview(payload, this.userInfo.ceaTeacherId)
-    },
-    async loadSingleTestData() {
-      const payload = {
-        term: this.term,
-        className: this.className,
-        kind: '数学',
-        testName: this.testName
-      }
-      return await singleTest(payload, this.userInfo.ceaTeacherId)
-    },
-    async loadSingleStudentTestData() {
-      const payload = {
-        term: this.term,
-        className: this.className,
-        kind: '数学',
-        name: this.studentName
-      }
-      return await singleStudentTest(payload, this.userInfo.ceaTeacherId)
-    },
-    setOverviewOption(overviewData) {
-      this.testNameList = overviewData.testNames
-      if (this.testNameList.length > 0) {
-        this.testName = this.testNameList[0]
+      const overviewData = await this.loadOverviewData(this.term, this.className)
+      this.section2TestNameList = overviewData.testNames
+      if (this.section2TestNameList.length > 0) {
+        this.section2TestName = this.section2TestNameList[0]
       } else {
-        this.testName = '暂无考试内容'
+        this.section2TestName = '暂无考试内容'
       }
       this.studentList = overviewData.studentNames
       if (this.studentList.length > 0) {
@@ -156,7 +158,46 @@ export default {
       } else {
         this.studentName = '暂无学生'
       }
+      this.setOverviewOption(overviewData)
 
+      const singleTestData = await this.loadSingleTestData(
+        this.section2Term,
+        this.section2ClassName,
+        this.section2TestName
+      )
+      this.setSingleTestOption(singleTestData)
+
+      const singleStudentTestData = await this.loadSingleStudentTestData(
+        this.section3Term,
+        this.section3ClassName,
+        this.studentName
+      )
+      this.setSingleStudentTestOption(singleStudentTestData)
+    })
+  },
+  methods: {
+    async loadClassList(term) {
+      const data = await getClassList(this.userInfo.ceaTeacherId, term)
+      return data
+    },
+    async loadOverviewData(term, className) {
+      const payload = { term: term, className: className, kind: '数学' }
+      const data = await overview(payload, this.userInfo.ceaTeacherId)
+      return data
+    },
+    async handleTermChange() {
+      const classList = await this.loadClassList(this.term)
+      this.classList = classList
+      if (this.classList.length > 0) {
+        this.className = this.classList[0].cea_class_name
+      } else {
+        this.className = '该学期暂无班级'
+      }
+      this.overviewChart.showLoading({ text: '正在加载...' })
+      const overviewData = await this.loadOverviewData(this.term, this.className)
+      this.setOverviewOption(overviewData)
+    },
+    setOverviewOption(overviewData) {
       this.overviewChart.config = {
         rotate: 90,
         align: 'left',
@@ -191,15 +232,9 @@ export default {
           }
         },
         dataZoom: [
-          // {
-          //   type: 'inside',
-          //   zoomLock: true,
-          //   start: 0,
-          //   end: 10
-          // },
           {
             type: 'slider',
-            zoomLock: true,
+            zoomLock: false,
             start: 0,
             end: 12,
             xAxisIndex: 0
@@ -289,9 +324,98 @@ export default {
       this.overviewChart.hideLoading()
       this.overviewChart.setOption(option, true)
     },
-    async handleTestChange() {
-      const singleTestData = await this.loadSingleTestData()
-      this.setSingleTestOption(singleTestData)
+    async handleClassChange() {
+      this.overviewChart.showLoading({ text: '正在加载...' })
+      const overviewData = await this.loadOverviewData(this.term, this.className)
+      this.setOverviewOption(overviewData)
+    },
+
+    async loadSingleTestData(term, className, testName) {
+      const payload = {
+        term: term,
+        className: className,
+        kind: '数学',
+        testName: testName
+      }
+      return await singleTest(payload, this.userInfo.ceaTeacherId)
+    },
+    async section2TermChange() {
+      this.singleTestChart.showLoading({ text: '正在加载...' })
+      const classList = await this.loadClassList(this.section2Term)
+      this.section2ClassList = classList
+      if (this.section2ClassList.length > 0) {
+        this.section2ClassName = this.section2ClassList[0].cea_class_name
+      } else {
+        this.section2ClassName = '该学期暂无班级'
+      }
+
+      const overviewData = await this.loadOverviewData(this.section2Term, this.section2ClassName)
+      this.section2TestNameList = overviewData.testNames
+      if (this.section2TestNameList.length > 0) {
+        this.section2TestName = this.section2TestNameList[0]
+      } else {
+        this.section2TestName = '暂无考试内容'
+      }
+
+      const singleTestData = await this.loadSingleTestData(
+        this.section2Term,
+        this.section2ClassName,
+        this.section2TestName
+      )
+      const option = this.singleTestChart.getOption()
+      option.series[0].data = singleTestData.scoreList
+      option.series[0].name = this.section2TestName
+      option.series[0].markLine.data[0].yAxis = singleTestData.min || 0
+      option.series[0].markLine.data[1].yAxis = singleTestData.avg
+      option.series[0].markLine.data[2].yAxis = singleTestData.max || 0
+      option.xAxis[0].data = singleTestData.studentList
+      this.singleTestChart.hideLoading()
+      this.singleTestChart.setOption(option)
+    },
+    async section2ClassChange() {
+      this.singleTestChart.showLoading({ text: '正在加载...' })
+      const overviewData = await this.loadOverviewData(this.section2Term, this.section2ClassName)
+      this.section2TestNameList = overviewData.testNames
+      if (this.section2TestNameList.length > 0) {
+        this.section2TestName = this.section2TestNameList[0]
+      } else {
+        this.section2TestName = '暂无考试内容'
+      }
+
+      const singleTestData = await this.loadSingleTestData(
+        this.section2Term,
+        this.section2ClassName,
+        this.section2TestName
+      )
+      const option = this.singleTestChart.getOption()
+      option.series[0].data = singleTestData.scoreList
+      option.series[0].name = this.section2TestName
+      option.series[0].markLine.data[0].yAxis = singleTestData.min || 0
+      option.series[0].markLine.data[1].yAxis = singleTestData.avg
+      option.series[0].markLine.data[2].yAxis = singleTestData.max || 0
+      option.xAxis[0].data = singleTestData.studentList
+      this.singleTestChart.hideLoading()
+      this.singleTestChart.setOption(option)
+    },
+    async section2TestChange() {
+      const singleTestData = await this.loadSingleTestData(
+        this.section2Term,
+        this.section2ClassName,
+        this.section2TestName
+      )
+      const option = this.singleTestChart.getOption()
+      option.series[0].data = singleTestData.scoreList
+      option.series[0].name = this.section2TestName
+      option.series[0].markLine.data[0].yAxis = singleTestData.min || 0
+      option.series[0].markLine.data[1].yAxis = singleTestData.avg
+      option.series[0].markLine.data[2].yAxis = singleTestData.max || 0
+      option.xAxis[0].data = singleTestData.studentList
+      this.singleTestChart.setOption(option)
+    },
+    onSortTestScore() {
+      const option = this.singleTestChart.getOption()
+      option.series[0].realtimeSort = true
+      this.singleTestChart.setOption(option)
     },
     setSingleTestOption(singleTestData) {
       this.singleTestChart.config = {
@@ -302,7 +426,9 @@ export default {
         distance: 15
       }
       const option = {
-        title: {},
+        title: {
+          text: '考试成绩'
+        },
         tooltip: {
           trigger: 'axis',
           position: function (point, params, dom, rect, size) {
@@ -315,9 +441,11 @@ export default {
         dataZoom: [
           {
             type: 'slider',
-            zoomLock: true,
+            zoomLock: false,
+            orient: 'vertical',
+            right: 60,
             start: 0,
-            end: 40,
+            end: 100,
             xAxisIndex: 0
           }
         ],
@@ -340,6 +468,7 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
+            axisLabel: { rotate: 90 },
             data: singleTestData.studentList
           }
         ],
@@ -350,16 +479,18 @@ export default {
         ],
         series: [
           {
-            name: this.testName,
+            name: this.section2TestName,
             type: 'bar',
             barGap: 0,
+            // realtimeSort: true,
             label: {
               show: true,
               position: 'insideBottom',
               distance: 15,
               verticalAlign: 'middle',
               fontWeight: 'bold',
-              fontSize: 16
+              fontSize: 16,
+              valueAnimation: true
             },
             emphasis: {
               focus: 'series'
@@ -379,9 +510,9 @@ export default {
                 color: 'red'
               },
               data: [
-                { name: '最低分', yAxis: singleTestData.min },
+                { name: '最低分', yAxis: singleTestData.min || 0 },
                 { name: '平均分', yAxis: singleTestData.avg },
-                { name: '最高分', yAxis: singleTestData.max }
+                { name: '最高分', yAxis: singleTestData.max || 0 }
               ]
             }
           }
@@ -390,18 +521,95 @@ export default {
       this.singleTestChart.hideLoading()
       this.singleTestChart.setOption(option, true)
     },
-    async handleStudentChange() {
-      const singleStudentTestData = await this.loadSingleStudentTestData()
-      this.setSingleStudentTestOption(singleStudentTestData)
+
+    async loadSingleStudentTestData(term, className, studentName) {
+      const payload = {
+        term: term,
+        className: className,
+        kind: '数学',
+        name: studentName
+      }
+      const data = await singleStudentTest(payload, this.userInfo.ceaTeacherId)
+      return data
+    },
+    async section3TermChange() {
+      this.singleStudentTestChart.showLoading({ text: '正在加载...' })
+      const classList = await this.loadClassList(this.section3Term)
+      this.section3ClassList = classList
+      if (this.section3ClassList.length > 0) {
+        this.section3ClassName = this.section3ClassList[0].cea_class_name
+      } else {
+        this.section3ClassName = '该学期暂无班级'
+      }
+
+      const overviewData = await this.loadOverviewData(this.section3Term, this.section3ClassName)
+      this.studentList = overviewData.studentNames
+      if (this.studentList.length > 0) {
+        this.studentName = this.studentList[0]
+      } else {
+        this.studentName = '暂无学生'
+      }
+
+      const studentData = await this.loadSingleStudentTestData(
+        this.section3Term,
+        this.section3ClassName,
+        this.studentName
+      )
+      const option = this.singleStudentTestChart.getOption()
+      option.series[0].data = studentData.scoreList
+      option.series[0].name = this.studentName
+      option.series[0].markLine.data[0].yAxis = studentData.min || 0
+      option.series[0].markLine.data[1].yAxis = studentData.avg
+      option.series[0].markLine.data[2].yAxis = studentData.max || 0
+      option.xAxis[0].data = studentData.testNames
+      option.xAxis[0].axisLabel = { rotate: 30 }
+      this.singleStudentTestChart.hideLoading()
+      this.singleStudentTestChart.setOption(option)
+    },
+    async section3ClassChange() {
+      this.singleStudentTestChart.showLoading({ text: '正在加载...' })
+      const overviewData = await this.loadOverviewData(this.section3Term, this.section3ClassName)
+      this.studentList = overviewData.studentNames
+      if (this.studentList.length > 0) {
+        this.studentName = this.studentList[0]
+      } else {
+        this.studentName = '暂无学生'
+      }
+
+      const studentData = await this.loadSingleStudentTestData(
+        this.section3Term,
+        this.section3ClassName,
+        this.studentName
+      )
+      const option = this.singleTestChart.getOption()
+      option.series[0].data = studentData.scoreList
+      option.series[0].name = this.studentName
+      option.series[0].markLine.data[0].yAxis = studentData.min || 0
+      option.series[0].markLine.data[1].yAxis = studentData.avg
+      option.series[0].markLine.data[2].yAxis = studentData.max || 0
+      option.xAxis[0].data = studentData.testNames
+      option.xAxis[0].axisLabel = { rotate: 30 }
+      this.singleStudentTestChart.hideLoading()
+      this.singleStudentTestChart.setOption(option)
+    },
+    async section3StudentChange() {
+      const singleStudentTestData = await this.loadSingleStudentTestData(
+        this.section2Term,
+        this.section2ClassName,
+        this.studentName
+      )
+      const option = this.singleTestChart.getOption()
+      option.series[0].data = singleStudentTestData.scoreList
+      option.series[0].name = this.studentName
+      option.series[0].markLine.data[0].yAxis = singleStudentTestData.min || 0
+      option.series[0].markLine.data[1].yAxis = singleStudentTestData.avg
+      option.series[0].markLine.data[2].yAxis = singleStudentTestData.max || 0
+      option.xAxis[0].data = singleStudentTestData.testNames
+      option.xAxis[0].axisLabel = { rotate: 30 }
+      this.singleStudentTestChart.hideLoading()
+      this.singleStudentTestChart.setOption(option)
     },
     setSingleStudentTestOption(studentData) {
-      this.singleTestChart.config = {
-        rotate: 90,
-        align: 'left',
-        verticalAlign: 'middle',
-        position: 'insideBottom',
-        distance: 15
-      }
       const option = {
         title: {},
         tooltip: {
@@ -413,15 +621,17 @@ export default {
             type: 'shadow'
           }
         },
-        // dataZoom: [
-        //   {
-        //     type: 'slider',
-        //     zoomLock: true,
-        //     start: 0,
-        //     end: 40,
-        //     xAxisIndex: 0
-        //   }
-        // ],
+        dataZoom: [
+          {
+            type: 'slider',
+            zoomLock: false,
+            orient: 'vertical',
+            right: 60,
+            start: 0,
+            end: 100,
+            xAxisIndex: 0
+          }
+        ],
         legend: {
           data: []
         },
@@ -441,7 +651,7 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            axisLabel: { rotate: 90 },
+            axisLabel: { rotate: 30 },
             data: studentData.testNames
           }
         ],
@@ -500,4 +710,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .size-change {
+    font-size: 20px;
+    z-index: 10000;
+  }
+  .size-change:hover {
+    color: $primary-color;
+    transform: scale(1.3);
+    transition: transform 0.5s;
+  }
 </style>
