@@ -7,7 +7,7 @@
       <div id="clock" class="w-1/2 h-full">
         <a-spin size="large" v-if="loading" style="position: absolute; left: 25%; top: 50%" />
       </div>
-      <div class="w-1/2 h-full flex justify-center items-center" :style="{ fontSize: '200px' }">
+      <div class="w-1/2 h-full flex justify-center items-center" :style="{ fontSize: '140px' }">
         {{ hour + ':' + minute + ':' + second }}
       </div>
     </div>
@@ -28,7 +28,7 @@
         <div id="clock-full-screen" class="w-1/2 h-full">
           <a-spin size="large" v-if="loadingFull" style="position: absolute; left: 25%; top: 50%" />
         </div>
-        <div class="w-1/2 h-full flex justify-center items-center" :style="{ fontSize: '200px' }">
+        <div class="w-1/2 h-full flex justify-center items-center" :style="{ fontSize: '140px' }">
           {{ hour + ':' + minute + ':' + second }}
         </div>
       </div>
@@ -243,9 +243,9 @@ export default {
         minute: false,
         hour: false
       },
-      hour: '0',
-      minute: '0',
-      second: '0',
+      hour: '00',
+      minute: '00',
+      second: '00',
 
       loading: true,
       loadingFull: false
@@ -268,9 +268,9 @@ export default {
         const second = date.getSeconds()
         const minute = date.getMinutes() + second / 60
         const hour = (date.getHours() % 12) + minute / 60
-        this.hour = hour.toFixed(0)
-        this.minute = minute.toFixed(0)
-        this.second = second
+        this.hour = date.getHours() <= 9 ? `0${date.getHours()}` : date.getHours()
+        this.minute = date.getMinutes() <= 9 ? `0${date.getMinutes()}` : date.getMinutes()
+        this.second = second <= 9 ? `0${second}` : second
 
         this.updateSeries(second, this.option.series[2], 'second')
         this.updateSeries(minute, this.option.series[1], 'minute')
