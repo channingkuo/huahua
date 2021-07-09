@@ -15,6 +15,7 @@
 <script>
 import SubMenu from './sub.menu'
 import { mapGetters } from 'vuex'
+import { isEmpty } from '../../utils/common'
 
 export default {
   name: 'Side-Menu',
@@ -30,13 +31,40 @@ export default {
   created() {
     const { path } = this.$route
     const menu = this.menuList.find((menu) => menu.path === path)
-    this.openedKeys = [menu.key]
+    if (menu) {
+      this.openedKeys = [menu.key]
+    }
     console.log(this.openedKeys)
   },
   methods: {
     openPage({ item, key, keyPath }) {
+      console.log(key)
       this.openedKeys = [key]
-      const path = this.menuList[parseInt(key)].path
+      const menuIndex = this.menuList.findIndex((item) => item.key === key)
+      let path = ''
+      if (menuIndex < 0) {
+        const menu = this.menuList[3]
+        if (menu.children && menu.children.length > 0) {
+          const index = menu.children.findIndex((item) => item.key === key)
+          if (index >= 0) {
+            path = menu.children[index].path
+          } else {
+            this.$message.error('菜单异常，请联系Kuo! (♥ω♥)~♪ ')
+            return
+          }
+        } else {
+          this.$message.error('菜单异常，请联系Kuo! (♥ω♥)~♪ ')
+          return
+        }
+      } else {
+        const menu = this.menuList[menuIndex]
+        path = menu.path
+      }
+
+      if (isEmpty(path)) {
+        this.$message.error('菜单异常，请联系Kuo! (♥ω♥)~♪ ')
+        return
+      }
       this.$router.push({ path: path }).catch((err) => {
         console.error(err)
       })

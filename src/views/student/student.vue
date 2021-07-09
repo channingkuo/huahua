@@ -56,12 +56,23 @@
           <template slot="index" slot-scope="text, record, index">
             {{ index + 1 }}
           </template>
-          <template slot="cea_student_gender" slot-scope="text">
-            <a-tag color="volcano" v-if="!text"> 男 </a-tag>
-            <a-tag color="pink" v-if="text"> 女 </a-tag>
+          <template slot="cea_student_gender" slot-scope="text, record">
+            <template v-if="!record.editing">
+              <a-tag color="volcano" v-if="!text"> 男 </a-tag>
+              <a-tag color="pink" v-if="text"> 女 </a-tag>
+            </template>
+            <template v-else>
+              <a-select v-model="record.cea_student_gender" placeholder="请选择学生性别">
+                <a-select-option :value="0"> 男 </a-select-option>
+                <a-select-option :value="1"> 女 </a-select-option>
+              </a-select>
+            </template>
           </template>
           <template slot="operator" slot-scope="text, record, index">
             <div class="flex justify-around justify-items-center">
+              <a v-if="!record.editing" @click="onEditRow(record, index)">编辑</a>
+              <a v-else @click="onCancelEditRow(record, index)">取消</a>
+              <a v-if="record.editing" @click="onSaveEditRow(record, index)">保存</a>
               <a-popconfirm
                 title="是否确认删除该行?一旦删除，数据无法恢复！"
                 ok-text="确认"
@@ -209,7 +220,7 @@ export default {
           align: 'center',
           dataIndex: 'operator',
           scopedSlots: { customRender: 'operator' },
-          width: 120
+          width: 200
         }
       ],
       studentList: [],
@@ -308,7 +319,14 @@ export default {
           this.submitLoading = false
         }
       })
-    }
+    },
+    onEditRow(record, index) {
+      this.$set(record, 'editing', true)
+    },
+    onCancelEditRow(record, index) {
+      this.$set(record, 'editing', false)
+    },
+    onSaveEditRow(record, index) {}
   },
   computed: {
     ...mapGetters(['userInfo'])
