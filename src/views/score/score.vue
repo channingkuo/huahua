@@ -312,6 +312,9 @@ export default {
         let testNameSets = ''
         for (let i = 0; i < this.scoreList.length; i++) {
           const score = this.scoreList[i]
+          if (score.avg_score) {
+            score.avg_score = score.avg_score.toFixed(2)
+          }
           if (score.test_name_sets.length >= testNameSets.length) {
             testNameSets = score.test_name_sets
           }
@@ -342,6 +345,12 @@ export default {
           })
         }
       }
+      this.columns.push({
+        title: '平均分',
+        dataIndex: 'avg_score',
+        align: 'center',
+        fixed: 'right'
+      })
     },
     handleChange() {
       this.loadClassList()
@@ -371,6 +380,11 @@ export default {
         let testNameSets = ''
         for (let i = 0; i < this.scoreList.length; i++) {
           const score = this.scoreList[i]
+
+          if (score.avg_score) {
+            score.avg_score = score.avg_score.toFixed(2)
+          }
+
           if (score.test_name_sets.length >= testNameSets.length) {
             testNameSets = score.test_name_sets
           }
@@ -401,6 +415,12 @@ export default {
           })
         }
       }
+      this.columns.push({
+        title: '平均分',
+        dataIndex: 'avg_score',
+        align: 'center',
+        fixed: 'right'
+      })
     },
     onUpload(scoreList) {
       this.$message.info('正在上传...')

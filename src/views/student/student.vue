@@ -56,6 +56,19 @@
           <template slot="index" slot-scope="text, record, index">
             {{ index + 1 }}
           </template>
+          <template slot="cea_student_name" slot-scope="text, record">
+            <template v-if="!record.editing">
+              {{ text }}
+            </template>
+            <template v-else>
+              <a-input
+                v-model="record.cea_student_name"
+                allowClear
+                placeholder="输入学生姓名"
+                :style="{ width: '160px' }"
+              />
+            </template>
+          </template>
           <template slot="cea_student_gender" slot-scope="text, record">
             <template v-if="!record.editing">
               <a-tag color="volcano" v-if="!text"> 男 </a-tag>
@@ -207,6 +220,7 @@ export default {
         {
           title: '姓名',
           dataIndex: 'cea_student_name',
+          scopedSlots: { customRender: 'cea_student_name' },
           align: 'center'
         },
         {
@@ -326,7 +340,21 @@ export default {
     onCancelEditRow(record, index) {
       this.$set(record, 'editing', false)
     },
-    onSaveEditRow(record, index) {}
+    onSaveEditRow(record, index) {
+      console.log(record)
+
+      const payload = {
+        ceaStudentId: record.cea_student_id,
+        ceaClassId: record.cea_class_id,
+        ceaStudentName: record.cea_student_name,
+        ceaStudentGender: record.cea_student_gender,
+        ceaStudentStatus: record.cea_student_status
+      }
+      saveStudent(payload).then((resp) => {
+        this.$message.success('修改成功！')
+        this.loadList()
+      })
+    }
   },
   computed: {
     ...mapGetters(['userInfo'])

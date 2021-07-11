@@ -274,11 +274,11 @@ export default {
           width: 60,
           align: 'center'
         },
-        {
-          title: '学期',
-          dataIndex: 'cea_term',
-          align: 'center'
-        },
+        // {
+        //   title: '学期',
+        //   dataIndex: 'cea_term',
+        //   align: 'center'
+        // },
         {
           title: '班级',
           dataIndex: 'cea_class_name',
