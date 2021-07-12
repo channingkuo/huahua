@@ -468,7 +468,11 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            axisLabel: { rotate: 90 },
+            axisLabel: {
+              formatter: function (value, index) {
+                return value.split('').join('\n')
+              }
+            },
             data: singleTestData.studentList
           }
         ],
@@ -651,7 +655,13 @@ export default {
           {
             type: 'category',
             axisTick: { show: false },
-            axisLabel: { rotate: 30 },
+            axisLabel: {
+              // align: 'right',
+              rotate: 10
+              // formatter: function (value, index) {
+              //   return value.split('').join('\n')
+              // }
+            },
             data: studentData.testNames
           }
         ],
