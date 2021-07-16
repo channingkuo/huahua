@@ -298,7 +298,7 @@ export default {
     md5,
     async loadList() {
       this.loading = true
-
+      this.columns = [...this.tmpColumns]
       const payload = {
         term: this.term,
         className: this.className,
@@ -365,7 +365,7 @@ export default {
       }
     },
     async onSearch() {
-      this.columns = this.tmpColumns
+      this.columns = [...this.tmpColumns]
       this.loading = true
       const payload = {
         term: this.term,
