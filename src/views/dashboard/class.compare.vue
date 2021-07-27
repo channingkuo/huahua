@@ -1,5 +1,6 @@
 <template>
   <div class="w-full">
+    <i>下图标为测试数据，未完成！</i>
     <div class="h-14 pb-2 flex justify-start items-center">
       <span class="pl-2">学期：</span>
       <a-select v-model="term" style="width: 140px" @change="termChange">
