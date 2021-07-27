@@ -79,6 +79,10 @@
     </div>
     <div id="single-student-test" class="w-full h-96"></div>
 
+    <test-average />
+
+    <class-compare />
+
     <div class="h-20"></div>
   </div>
 </template>
@@ -88,10 +92,15 @@ import { mapGetters } from 'vuex'
 import * as echarts from 'echarts'
 import { overview, singleTest, singleStudentTest } from './dashboard.service'
 import { getClassList } from '../term/term.service'
+import TestAverage from './tests.average.vue'
+import ClassCompare from './class.compare.vue'
 
 export default {
   name: 'dashboard',
-  components: {},
+  components: {
+    TestAverage,
+    ClassCompare
+  },
   data() {
     return {
       term: '',
@@ -297,7 +306,7 @@ export default {
         })
       }
       series.push({
-        name: '平均分',
+        name: '均分',
         type: 'line',
         label: {
           show: true,
@@ -305,10 +314,10 @@ export default {
           distance: 15,
           align: 'left',
           verticalAlign: 'middle',
-          formatter: '{c}  {name|{a}}',
+          formatter: '{name|{a}}:{c}',
           color: 'red',
           fontWeight: 'bold',
-          fontSize: 20,
+          fontSize: 16,
           rich: {
             name: {}
           }
@@ -615,7 +624,9 @@ export default {
     },
     setSingleStudentTestOption(studentData) {
       const option = {
-        title: {},
+        title: {
+          text: '学生成绩'
+        },
         tooltip: {
           trigger: 'axis',
           position: function (point, params, dom, rect, size) {
